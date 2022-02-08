@@ -1,19 +1,20 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private userService: UsersService,
+  ) {}
 
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto) {
-    // Fix: move to user controller
-    await this.authService.isUniqueUser(signUpDto);
+    const { username, email } = signUpDto;
 
-    // TODO: create user method
-
-    return signUpDto;
+    return await this.userService.create(username, email);
   }
 
   @Post('refresh')
