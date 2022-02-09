@@ -1,4 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Get,
+  Body,
+  Post,
+  Controller,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -11,6 +18,7 @@ export class AuthController {
   ) {}
 
   @Post('signup')
+  @UseInterceptors(ClassSerializerInterceptor)
   async signUp(@Body() signUpDto: SignUpDto) {
     const { username, email } = signUpDto;
 
@@ -30,5 +38,10 @@ export class AuthController {
   @Post('reset')
   resetPassword() {
     return 'reset';
+  }
+
+  @Get('activate')
+  activate() {
+    return 'ok';
   }
 }

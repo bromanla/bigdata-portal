@@ -3,5 +3,6 @@ import { MailService } from './mail.service';
 
 @Module({
   providers: [MailService],
+  exports: [],
 })
 export class MailModule {}

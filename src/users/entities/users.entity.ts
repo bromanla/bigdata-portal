@@ -17,8 +17,8 @@ export class Users {
   @Column()
   email: string;
 
-  @Exclude()
   @Column()
+  @Exclude()
   password: string;
 
   @Column({ default: false })
