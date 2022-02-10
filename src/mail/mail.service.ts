@@ -3,25 +3,23 @@ import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailService {
-  // constructor() {}
-
   private transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: +process.env.SMTP_PORT,
-    secure: true,
+    secure: false,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASSWORD,
     },
   });
 
-  sendMail() {
+  async sendMail() {
     return this.transporter.sendMail({
-      from: '"Fred Foo 👻" <foo@example.com>', // sender address
-      to: '', // list of receivers
-      subject: 'Hello ✔', // Subject line
-      text: 'Hello world?', // plain text body
-      html: '<b>Hello world?</b>', // html body
+      from: '',
+      to: '',
+      subject: '',
+      text: '',
+      html: '',
     });
   }
 }
