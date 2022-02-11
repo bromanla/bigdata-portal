@@ -29,6 +29,18 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async findOneByEmail(email: string) {
+    return this.usersRepository.find({ where: { email } });
+  }
+
+  async findOneByUsername(username: string) {
+    return this.usersRepository.find({ where: { username } });
+  }
+
+  async findOneById(id: number) {
+    return this.usersRepository.findByIds([id]);
+  }
+
   async isUniqueUser(username: string, email: string) {
     const users = await this.usersRepository.find({
       where: [{ username }, { email }],
