@@ -3,22 +3,34 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/users/entities/users.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(Users)
     private readonly usersRepository: Repository<Users>,
+    private readonly userService: UsersService,
   ) {}
 
-  async signIn(email: string, password: string) {
-    const [user] = await this.usersRepository.find({ where: { email } });
+  // async signIn(email: string, password: string) {
+  //   const [user] = await this.usersRepository.find({ where: { email } });
 
-    if (!user) throw new BadRequestException('wrong login or password');
+  //   if (!user) throw new BadRequestException('wrong login or password');
+
+  //   const isHashCorrect = await bcrypt.compare(password, user.password);
+
+  //   if (!isHashCorrect)
+  //     throw new BadRequestException('wrong login or password');
+  // }
+
+  async validateUser(email: string, password: string): Promise<Users> | null {
+    const [user] = await this.userService.findOneByEmail(email);
+    if (!user) return null;
 
     const isHashCorrect = await bcrypt.compare(password, user.password);
+    if (!isHashCorrect) return null;
 
-    if (!isHashCorrect)
-      throw new BadRequestException('wrong login or password');
+    return user;
   }
 }
