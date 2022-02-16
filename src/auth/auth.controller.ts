@@ -1,17 +1,16 @@
 import {
-  Get,
   Body,
   Post,
+  HttpCode,
+  UseGuards,
   Controller,
   UseInterceptors,
   ClassSerializerInterceptor,
-  UseGuards,
-  Request,
-  HttpCode,
 } from '@nestjs/common';
+import { RequestUser } from 'src/common/decorators/user-request.decorator';
+import { Users } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
-// import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
@@ -33,29 +32,13 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(LocalAuthGuard)
   @Post('signin')
-  async signIn(@Request() req) {
-    return req.user;
-  }
+  async signIn(@RequestUser() user: Users) {
+    const tokens = await this.authService.issueTokens(
+      user.id,
+      user.username,
+      user.role,
+    );
 
-  // @Post('signin')
-  // async signIn(@Body() signInDto: SignInDto) {
-  //   const { email, password } = signInDto;
-
-  //   return await this.authService.signIn(email, password);
-  // }
-
-  @Post('refresh')
-  refresh() {
-    return 'refresh';
-  }
-
-  @Post('reset')
-  resetPassword() {
-    return 'reset';
-  }
-
-  @Get('activate')
-  activate() {
-    return 'ok';
+    return tokens;
   }
 }

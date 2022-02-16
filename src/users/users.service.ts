@@ -25,8 +25,9 @@ export class UsersService {
       isActivated: false,
     });
 
-    console.log(password);
     // TODO: send password to mail
+    console.log(password);
+
     return this.usersRepository.save(user);
   }
 

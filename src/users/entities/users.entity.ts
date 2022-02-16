@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Tokens } from 'src/auth/entities/tokens.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UsersRole {
   ADMIN = 'admin',
@@ -30,4 +31,7 @@ export class Users {
     default: UsersRole.USER,
   })
   role: UsersRole;
+
+  @OneToMany(() => Tokens, (token) => token.user)
+  tokens: Promise<Tokens[]>;
 }

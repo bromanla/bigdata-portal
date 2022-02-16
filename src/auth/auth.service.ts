@@ -1,36 +1,48 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from 'src/users/entities/users.entity';
-import { Repository } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Users, UsersRole } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
+import { v4 as uuidv4 } from 'uuid';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Tokens } from './entities/tokens.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Users)
-    private readonly usersRepository: Repository<Users>,
-    private readonly userService: UsersService,
+    @InjectRepository(Tokens)
+    private readonly tokensRepository: Repository<Tokens>,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  // async signIn(email: string, password: string) {
-  //   const [user] = await this.usersRepository.find({ where: { email } });
-
-  //   if (!user) throw new BadRequestException('wrong login or password');
-
-  //   const isHashCorrect = await bcrypt.compare(password, user.password);
-
-  //   if (!isHashCorrect)
-  //     throw new BadRequestException('wrong login or password');
-  // }
-
-  async validateUser(email: string, password: string): Promise<Users> | null {
-    const [user] = await this.userService.findOneByEmail(email);
-    if (!user) return null;
+  async signIn(email: string, password: string): Promise<Users> {
+    const [user] = await this.usersService.findOneByEmail(email);
+    if (!user) throw new UnauthorizedException('wrong login or password');
 
     const isHashCorrect = await bcrypt.compare(password, user.password);
-    if (!isHashCorrect) return null;
+    if (!isHashCorrect)
+      throw new UnauthorizedException('wrong login or password');
 
     return user;
+  }
+
+  async issueTokens(id: number, username: string, role: UsersRole) {
+    const refresh = uuidv4();
+    const hashedRefresh = await bcrypt.hash(refresh, 10);
+    const payload = { id, username, role };
+
+    const tokens = this.tokensRepository.create({
+      userId: id,
+      refresh: hashedRefresh,
+    });
+
+    await this.tokensRepository.save(tokens);
+
+    return {
+      access: this.jwtService.sign(payload),
+      refresh,
+    };
   }
 }
