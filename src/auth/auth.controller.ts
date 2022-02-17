@@ -1,12 +1,4 @@
-import {
-  Body,
-  Post,
-  HttpCode,
-  UseGuards,
-  Controller,
-  UseInterceptors,
-  ClassSerializerInterceptor,
-} from '@nestjs/common';
+import { Body, Post, HttpCode, UseGuards, Controller } from '@nestjs/common';
 import { RequestUser } from 'src/common/decorators/user-request.decorator';
 import { Users } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
@@ -22,7 +14,6 @@ export class AuthController {
   ) {}
 
   @Post('signup')
-  @UseInterceptors(ClassSerializerInterceptor)
   async signUp(@Body() signUpDto: SignUpDto) {
     const { username, email } = signUpDto;
 
