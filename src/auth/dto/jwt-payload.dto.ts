@@ -1,7 +1,7 @@
 import { UsersRole } from 'src/users/entities/users.entity';
 
 export class JwtPayload {
-  id: number;
+  userId: number;
 
   username: string;
 

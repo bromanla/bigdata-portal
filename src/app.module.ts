@@ -27,10 +27,10 @@ import * as Joi from 'joi';
         NODE_ENV: Joi.string().valid('development', 'production'),
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRES: Joi.string().required(),
+        JWT_REFRESH_EXPIRES: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',

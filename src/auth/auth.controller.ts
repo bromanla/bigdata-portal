@@ -4,6 +4,7 @@ import { Users } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
+import { JwtRefreshGuard } from './guards/jwt-refresh-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
@@ -31,5 +32,12 @@ export class AuthController {
     );
 
     return tokens;
+  }
+
+  @HttpCode(200)
+  @UseGuards(JwtRefreshGuard)
+  @Post('refresh')
+  async() {
+    return 'refresh';
   }
 }
