@@ -26,22 +26,24 @@ export class AuthController {
   @UseGuards(LocalGuard)
   @Post('signin')
   async signIn(@RequestUser() user: User) {
-    const tokens = await this.authService.issueTokens(
+    return await this.authService.issueTokens(
       user.id,
       user.username,
       user.role,
     );
-
-    return tokens;
   }
 
   @HttpCode(200)
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
-  async(@RequestUser() token: Token) {
-    // TODO: remove old token
-    // TODO: issue new Token
-    console.log(token);
-    return 'refresh';
+  async refresh(@RequestUser() token: Token) {
+    const user = await token.user;
+
+    await this.authService.removeRefreshTokenById(token.id);
+    return await this.authService.issueTokens(
+      user.id,
+      user.username,
+      user.role,
+    );
   }
 }

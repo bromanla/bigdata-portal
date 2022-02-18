@@ -56,6 +56,10 @@ export class AuthService {
     };
   }
 
+  async removeRefreshTokenById(id: number) {
+    return this.tokenRepository.delete(id);
+  }
+
   async compareRefreshTokens(
     userId: number,
     mark: string,
@@ -69,7 +73,6 @@ export class AuthService {
     const isHashCorrect = await bcrypt.compare(refreshToken, token.refresh);
     if (!isHashCorrect) throw new UnauthorizedException('token is not valid');
 
-    await token.user;
     return token;
   }
 }
