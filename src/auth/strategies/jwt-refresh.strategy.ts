@@ -1,9 +1,9 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
-import { JwtPayload } from '../dto/jwt-payload.dto';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
+import { JwtRefreshPayload } from '../dto/jwt-refresh-payload.dto';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -26,10 +26,13 @@ export class JwtRefreshStrategy extends PassportStrategy(
   // If I need to expand further, I will do it right
   async validate(
     request: Omit<Request, 'body'> & { body: { refresh: string } },
-    payload: JwtPayload,
+    payload: JwtRefreshPayload,
   ) {
-    // TODO: fix 401 http code for valid request
     const refreshToken = request.body.refresh;
-    await this.authService.compareRefreshTokens(payload.userId, refreshToken);
+    return await this.authService.compareRefreshTokens(
+      payload.userId,
+      payload.mark,
+      refreshToken,
+    );
   }
 }

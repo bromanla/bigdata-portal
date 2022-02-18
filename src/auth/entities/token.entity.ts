@@ -1,8 +1,8 @@
-import { Users } from 'src/users/entities/users.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Tokens {
+export class Token {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -12,8 +12,11 @@ export class Tokens {
   @Column()
   userId: number;
 
-  @ManyToOne(() => Users, (user) => user.tokens)
-  user: Promise<Users>;
+  @ManyToOne(() => User, (user) => user.tokens)
+  user: Promise<User>;
+
+  @Column()
+  mark: string;
 
   @Column({ default: 'NOW()' })
   created: Date;

@@ -1,11 +1,12 @@
 import { Body, Post, HttpCode, UseGuards, Controller } from '@nestjs/common';
 import { RequestUser } from 'src/common/decorators/user-request.decorator';
-import { Users } from 'src/users/entities/users.entity';
+import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
+import { Token } from './entities/token.entity';
 import { JwtRefreshGuard } from './guards/jwt-refresh-auth.guard';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LocalGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,9 +23,9 @@ export class AuthController {
   }
 
   @HttpCode(200)
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(LocalGuard)
   @Post('signin')
-  async signIn(@RequestUser() user: Users) {
+  async signIn(@RequestUser() user: User) {
     const tokens = await this.authService.issueTokens(
       user.id,
       user.username,
@@ -37,7 +38,10 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
-  async() {
+  async(@RequestUser() token: Token) {
+    // TODO: remove old token
+    // TODO: issue new Token
+    console.log(token);
     return 'refresh';
   }
 }

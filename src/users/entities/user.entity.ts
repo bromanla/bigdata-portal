@@ -1,14 +1,14 @@
 import { Exclude } from 'class-transformer';
-import { Tokens } from 'src/auth/entities/tokens.entity';
+import { Token } from 'src/auth/entities/token.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-export enum UsersRole {
+export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
 }
 
 @Entity()
-export class Users {
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -27,11 +27,11 @@ export class Users {
 
   @Column({
     type: 'enum',
-    enum: UsersRole,
-    default: UsersRole.USER,
+    enum: UserRole,
+    default: UserRole.USER,
   })
-  role: UsersRole;
+  role: UserRole;
 
-  @OneToMany(() => Tokens, (token) => token.user)
-  tokens: Promise<Tokens[]>;
+  @OneToMany(() => Token, (token) => token.user)
+  tokens: Promise<Token[]>;
 }

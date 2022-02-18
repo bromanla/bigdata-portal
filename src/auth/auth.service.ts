@@ -1,24 +1,25 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { Users, UsersRole } from 'src/users/entities/users.entity';
+import { User, UserRole } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Tokens } from './entities/tokens.entity';
+import { Token } from './entities/token.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Tokens)
-    private readonly tokensRepository: Repository<Tokens>,
+    @InjectRepository(Token)
+    private readonly tokenRepository: Repository<Token>,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
 
-  async signIn(email: string, password: string): Promise<Users> {
+  async signIn(email: string, password: string): Promise<User> {
     const [user] = await this.usersService.findOneByEmail(email);
     if (!user) throw new UnauthorizedException('wrong login or password');
 
@@ -29,8 +30,8 @@ export class AuthService {
     return user;
   }
 
-  async issueTokens(userId: number, username: string, role: UsersRole) {
-    const refreshPayload = { userId };
+  async issueTokens(userId: number, username: string, role: UserRole) {
+    const refreshPayload = { userId, mark: uuidv4() };
     const accessPayload = { userId, username, role };
 
     const refreshToken = this.jwtService.sign(refreshPayload, {
@@ -41,12 +42,13 @@ export class AuthService {
 
     // hash and add the refresh token to the repository
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    const newToken = this.tokensRepository.create({
+    const newToken = this.tokenRepository.create({
       userId,
       refresh: hashedRefreshToken,
+      mark: refreshPayload.mark,
     });
 
-    await this.tokensRepository.save(newToken);
+    await this.tokenRepository.save(newToken);
 
     return {
       access: accessToken,
@@ -54,11 +56,20 @@ export class AuthService {
     };
   }
 
-  async compareRefreshTokens(userId: number, refreshToken: string) {
-    const [token] = await this.tokensRepository.find({ userId });
+  async compareRefreshTokens(
+    userId: number,
+    mark: string,
+    refreshToken: string,
+  ) {
+    const [token] = await this.tokenRepository.find({
+      where: { userId, mark },
+    });
     if (!token) throw new UnauthorizedException('token is not valid');
 
     const isHashCorrect = await bcrypt.compare(refreshToken, token.refresh);
     if (!isHashCorrect) throw new UnauthorizedException('token is not valid');
+
+    await token.user;
+    return token;
   }
 }
