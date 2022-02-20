@@ -4,6 +4,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TasksModule } from './tasks/tasks.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -11,6 +12,7 @@ import * as Joi from 'joi';
     MailModule,
     UsersModule,
     AuthModule,
+    TasksModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({

@@ -1,4 +1,5 @@
 import { Body, Post, HttpCode, UseGuards, Controller } from '@nestjs/common';
+import { Public } from 'src/common/decorators/public.decorator';
 import { RequestUser } from 'src/common/decorators/user-request.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -15,6 +16,7 @@ export class AuthController {
     private userService: UsersService,
   ) {}
 
+  @Public()
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto) {
     const { username, email } = signUpDto;
@@ -22,9 +24,10 @@ export class AuthController {
     return await this.userService.create(username, email);
   }
 
-  @HttpCode(200)
+  @Public()
   @UseGuards(LocalGuard)
   @Post('signin')
+  @HttpCode(200)
   async signIn(@RequestUser() user: User) {
     return await this.authService.issueTokens(
       user.id,
@@ -33,9 +36,10 @@ export class AuthController {
     );
   }
 
-  @HttpCode(200)
+  @Public()
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
+  @HttpCode(200)
   async refresh(@RequestUser() token: Token) {
     const user = await token.user;
 

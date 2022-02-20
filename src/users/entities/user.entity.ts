@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Token } from 'src/auth/entities/token.entity';
+import { Task } from 'src/tasks/entities/task.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserRole {
@@ -34,4 +35,7 @@ export class User {
 
   @OneToMany(() => Token, (token) => token.user)
   tokens: Promise<Token[]>;
+
+  @OneToMany(() => Task, (task) => task.user)
+  tasks: Promise<Task[]>;
 }
