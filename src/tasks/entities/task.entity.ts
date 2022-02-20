@@ -1,12 +1,6 @@
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum TaskTypes {
-  'сбор коментариев',
-  'анализ тональности',
-  'облако ключевых слов – ассоциации с компанией',
-  'сбор целевой аудитории и её географические данные',
-}
+import { TaskType } from './task-type.entity';
 
 @Entity()
 export class Task {
@@ -24,6 +18,9 @@ export class Task {
 
   @Column()
   userId: number;
+
+  @ManyToOne(() => TaskType, (taskType) => taskType.tasks)
+  type: Promise<TaskType>;
 
   @ManyToOne(() => User, (user) => user.tasks)
   user: Promise<User>;
