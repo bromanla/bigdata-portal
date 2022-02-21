@@ -12,4 +12,12 @@ export class TasksService {
     @InjectRepository(TaskType)
     private readonly taskTypeRepository: Repository<TaskType>,
   ) {}
+
+  findAllTaskTypes() {
+    return this.taskTypeRepository.find();
+  }
+
+  async createTask() {
+    return true;
+  }
 }
