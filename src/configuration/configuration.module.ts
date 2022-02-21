@@ -21,6 +21,7 @@ import * as Joi from 'joi';
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRES: Joi.string().required(),
         JWT_REFRESH_EXPIRES: Joi.string().required(),
+        DISK_HEALTH_PATH: Joi.string().required(),
       }),
     }),
   ],
